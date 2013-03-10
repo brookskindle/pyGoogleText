@@ -30,7 +30,7 @@ def mostRecentUnread(messages):
         for i in range(len(unread) - 1): #loop unread messages
             f = quantifyTime(unread[i].get("startTime"))
             s = quantifyTime(unread[i + 1].get("startTime"))
-            if (f > quantifyTime(unread[0].get("startTime")):
+            if (f > quantifyTime(unread[0].get("startTime"))):
                 earliest = unread[i]
 
 #accepts a struct time (from a message)
@@ -38,7 +38,38 @@ def mostRecentUnread(messages):
 #value representing the number of seconds
 #since Jan 01, 2000
 def quantifyTime(time):
-    
+    pass
+                
+def getLogin():
+    pass
+
+def getPhone():
+    pass
+
+def sortMostRecent(msglist):
+    pass
+
+def getUnread(gvoice):
+    pass
+
+def markMessage(msg):
+    pass
+
+def splitMessage(msg):
+    parts = msg.split()
+    number = int(parts[0])
+    msg = ""
+    for part in parts[1:]:
+        msg += part
+    return number, msg
+
+def textfwd(gvoice, phone, msg):
+    pass
+
+def wait(minutes = 5):
+    time.sleep(minutes * 60)
+    pass
+
 
 #loop infinitely
 while(True):
