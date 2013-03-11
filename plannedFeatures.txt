@@ -1,0 +1,7 @@
+confirmation texts - lets you know the message was successfully sent
+set wait delay option - just like being able to set the email, password, and search phone-number, you should be able to set the delay between updates.
+a settings class that allows you to save/load user settings (email, pw, phone, etc) with ease.
+ability to monitor multiple googlevoice accounts OR ability to monitor multiple phone numbers from one account
+a GUI, for the non-pi users
+command line arguments -setup and -gui. -setup asks user for email, pw, and etc. -gui starts the gui
+ability to text from any phone, not just your own. Could include a 6-digit pin code or something before specifying the fwd-phone and fwd-message for security. This would be useful if you forgot your phone and needed to text someone.
