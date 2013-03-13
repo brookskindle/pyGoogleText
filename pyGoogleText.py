@@ -26,13 +26,18 @@ def getLogin():
     returns usr, pw
     where usr is the email
     and pw is the password"""
-    pass
+    usr = raw_input("Enter google email address: ")
+    pw = raw_input("Enter password: ")
+    return usr, pw
 
 def getPhone():
     """prompts user for a phone number to monitor
     returns phone
     where phone is the phone number"""
-    pass
+    pr = "Which phone number do you want to monitor "
+    pr += "texts from? "
+    phone = raw_input(pr)
+    return phone
 
 def sortMostRecent(msglist):
     """sorts message list from newest to oldest"""
@@ -65,7 +70,7 @@ def markMessage(msg):
     """marks the message as read
     msg is the message to be marked
     does not return anything"""
-    pass
+    msg.mark(1)
 
 def splitMessage(msg):
     """returns a phone number and message
@@ -88,12 +93,11 @@ def textfwd(gvoice, phone, msg):
     gvoice is the Voice() instance
     phone is the desired phone number
     msg is the message"""
-    pass
+    gvoice.send_sms(phone, msg)
 
-def wait(minutes = 5):
-    """waits a given number of minutes"""
-    time.sleep(minutes * 60)
-    pass
+def wait(secs = 60):
+    """waits a given number of seconds"""
+    time.sleep(secs)
 
 def main():
     pass
