@@ -5,3 +5,7 @@ ability to monitor multiple googlevoice accounts OR ability to monitor multiple 
 a GUI, for the non-pi users
 command line arguments -setup and -gui. -setup asks user for email, pw, and etc. -gui starts the gui
 ability to text from any phone, not just your own. Could include a 6-digit pin code or something before specifying the fwd-phone and fwd-message for security. This would be useful if you forgot your phone and needed to text someone.
+
+****Known Errors****
+LoginError - occurs when you are unable to log into your google voice account
+URLError: <urlopen error [Errno 10060] A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond>

@@ -8,17 +8,16 @@ def quantifyTime(msg):
     where age is an integer value representing
     the age of the text message in seconds
     (since Jan 01, 2000)"""
-    mo = [31, 28, 31, 30, 31, 30,
-          31, 31, 30, 31, 30, 31]
     age = 0 #age of text
-    t = msg.get("time")
-    age += (t.years - 2000) * 365 * 24 * 60 * 60
-    for i in range(t.months):
-        age += mo[i] * 24 * 60 * 60
-    age += t.day * 24 * 60 * 60
-    age += t.hour * 60 * 60
-    age += t.minute * 60
-    age += t.second
+    t = msg.get("startTime")
+
+    age += (t.tm_year - 2000 - 1) * 365 * 24 * 60 * 60 #years
+    age += (t.tm_yday - 1) * 24 * 60 * 60 #days
+    age += (t.tm_hour - 1) * 60 * 60 #hours
+    age += (t.tm_min - 1) * 60 #minutes
+    age += t.tm_sec - 1 #seconds
+    age += t.tm_isdst * 60 * 60 #daylight savings time
+    
     return age
                 
 def getLogin():
@@ -62,15 +61,28 @@ def getUnreadTexts(gvoice):
     """returns a sorted message list of unread texts
     gvoice is the Voice() instance
     returns msglist
-    where msglist is a message list sorted from
-    newest to oldest"""
-    pass
+    where msglist is the unread message
+    list sorted from newest to oldest"""
+    sms = gvoice.sms()
+    unread = []
+    for msg in sms.messages:
+        if(not isRead(msg)): #unread sms
+            unread.append(msg)
+    sortMostRecent(unread)
+    return unread #return sorted, unread list of sms
 
-def markMessage(msg):
-    """marks the message as read
+def isRead(msg):
+    """returns if a text message has already been read"""
+    return msg.get("isRead")
+
+def markMessage(msg, isRead = 1):
+    """marks the message as either read
+    or unread (default mark as read)
     msg is the message to be marked
+    isRead is the status to mark the message
+    as, 1 for read, 0 for unread
     does not return anything"""
-    msg.mark(1)
+    msg.mark(isRead)
 
 def splitMessage(msg):
     """returns a phone number and message
@@ -99,8 +111,20 @@ def wait(secs = 60):
     """waits a given number of seconds"""
     time.sleep(secs)
 
+def test():
+    """tester function, tests the program"""
+    usr, pw = getLogin()
+    #query = getPhone()
+    print "Loggin' in..."
+    v = Voice()
+    v.login(usr, pw)
+    print "Displayin' unread texts..."
+    unread = getUnreadTexts(v)
+    for msg in unread:
+        print msg.get("messageText")
+
 def main():
-    pass
+    test() #test the program
 
 if __name__ == "__main__":
     main()
