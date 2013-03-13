@@ -1,5 +1,8 @@
 from googlevoice import Voice
 import time
+import shelve
+
+creds = {} #where we can store login credentials
 
 def quantifyTime(msg):
     """returns how old the text message is
@@ -25,8 +28,14 @@ def getLogin():
     returns usr, pw
     where usr is the email
     and pw is the password"""
-    usr = raw_input("Enter google email address: ")
-    pw = raw_input("Enter password: ")
+    if (not creds):
+        usr = raw_input("Enter google email address: ")
+        pw = raw_input("Enter password: ")
+        creds["usr"] = usr
+        creds["pw"] = pw
+    else:
+        usr = creds["usr"]
+        pw = creds["pw"]
     return usr, pw
 
 def getPhone():
@@ -111,17 +120,49 @@ def wait(secs = 60):
     """waits a given number of seconds"""
     time.sleep(secs)
 
+def print_msgs(msgs):
+    for msg in msgs:
+        print msg.get("messageText")
+
+def get_voice_object():
+    if creds.has_key("v"):
+        v = creds["v"] #get the stored voice object, so we don't keep creating a new one
+    else:
+        v = Voice()
+        creds["v"] = v
+    return v
+
 def test():
     """tester function, tests the program"""
     usr, pw = getLogin()
     #query = getPhone()
     print "Loggin' in..."
-    v = Voice()
+    v = get_voice_object()
     v.login(usr, pw)
     print "Displayin' unread texts..."
     unread = getUnreadTexts(v)
-    for msg in unread:
-        print msg.get("messageText")
+    print_msgs(unread)
+
+def store_creds():
+    credstore = shelve.open("creds")
+    for key in creds:
+        if (not key == "v"):
+            credstore[key] = creds[key]
+    credstore.sync()
+
+def load_creds():
+    credstore = shelve.open("creds")
+    creds.clear() #clear creds so that we can load different credentials if necessary
+    for key in credstore:
+        creds[key] = credstore[key]
+
+def erase_creds():
+    creds.clear()
+    store_creds()
+
+def refresh_creds():
+    creds.pop('v')
+    creds["v"] = get_voice_object() #gets a new voice object, which can be used to login as if new. Same usr and pw though
 
 def main():
     test() #test the program
