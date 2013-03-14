@@ -134,6 +134,7 @@ def get_voice_object():
 
 def test():
     """tester function, tests the program"""
+    load_creds()
     usr, pw = getLogin()
     #query = getPhone()
     print "Loggin' in..."
@@ -151,7 +152,11 @@ def store_creds():
     credstore.sync()
 
 def load_creds():
-    credstore = shelve.open("creds")
+    try:
+        credstore = shelve.open("creds")
+    except:
+        print "oops couldn't load creds from file"
+        return
     creds.clear() #clear creds so that we can load different credentials if necessary
     for key in credstore:
         creds[key] = credstore[key]
