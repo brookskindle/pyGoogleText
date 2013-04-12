@@ -1,6 +1,7 @@
 from googlevoice import Voice
 import time
 import shelve
+import os
 
 creds = {} #where we can store login credentials
 
@@ -132,8 +133,8 @@ def get_voice_object():
         creds["v"] = v
     return v
 
-def test():
-    """tester function, tests the program"""
+def runCmdProgram():
+	"""runs the command line version of the program"""
     load_creds()
     usr, pw = getLogin()
     #query = getPhone()
@@ -170,7 +171,7 @@ def refresh_creds():
     creds["v"] = get_voice_object() #gets a new voice object, which can be used to login as if new. Same usr and pw though
 
 def main():
-    test() #test the program
+	runCmdProgram() #test the program
 
 if __name__ == "__main__":
     main()
