@@ -78,7 +78,7 @@ def getUnreadTexts(gvoice, ph):
     sms = gvoice.sms()
     unread = []
     for msg in sms.messages:
-        if(not isRead(msg)): #unread sms
+        if(not isRead(msg) and msg.get("phoneNumber").find(ph) != -1): #unread sms from the monitored phone number
             unread.append(msg)
     sortMostRecent(unread)
     return unread #return sorted, unread list of sms
@@ -116,8 +116,9 @@ def parseMsg(msg):
 	except: 
 		raise ParseError #unable to parse phone number correctly
 	msg = ""
-  	for part in parts[1:]:
-		msg += part
+  	for part in parts[1:-1]:
+		msg += part + ' '
+	msg += part #prevent appending ' ' to end of message
 	return number, msg
 
 def textfwd(gvoice, phone, msg):
@@ -148,6 +149,10 @@ def runCmdProgram():
     	load_creds()
 	usr, pw = getLogin() #login credentials
 	query = getPhone() #get phone number to monitor
+	query.replace('(', '')
+	query.replace(')', '')
+	query.replace(' ', '')
+	query.replace('-', '')
 	print "Loggin' in..."
 	v = get_voice_object()
     	v.login(usr, pw)
@@ -156,15 +161,17 @@ def runCmdProgram():
 		unread = getUnreadTexts(v, query)
 		for new in unread: #loop unread messages
 			try:
-				print "Message:", new 
-				ph, txt = parseMsg(new)
+				msg = new.get("messageText") #text message in string form (msg)
+				ph, txt = parseMsg(msg) #split string into phone number and text message parts
 			except ParseError: #invalid message
-				pass
+				print "Unable to parse message", new, "...skipping"
 			else:
 				markMessage(new)
 				v.send_sms(ph, txt) #send text
-		print "Waiting 5 seconds before re-checking texts"
-		wait(5) #wait a minute before checking texts again
+				print "Text sent to " + ph + " : \"" + txt + "\""
+		secs = 5
+		print "Waiting", secs, "second(s) before fetching unread texts"
+		wait(secs)
 
 def store_creds():
     credstore = shelve.open("creds")
