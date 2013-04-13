@@ -1,3 +1,4 @@
 creds
 *.swp
 old.py
+*.pyc
