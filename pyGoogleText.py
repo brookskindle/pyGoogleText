@@ -95,6 +95,26 @@ def markMessage(msg, isRead = 1):
     as, 1 for read, 0 for unread
     does not return anything"""
     msg.mark(isRead)
+	
+def get_msg_children(msg):
+	return msg.children() #does this work?
+
+def delMessage(msg, move2Trash = 1):
+	"""deletes the message. Use after sending
+	the message off to the intended recipient. 
+	This is so that when the othe person replies
+	he does not get a repeat message, since only
+	the first message generally shows up as unread,
+	and would continually send off that same first msg"""
+	msg.delete(move2Trash) #if we call msg.delete(0) that un-deletes the msg
+	
+def cleanup_phone_number(number):
+	"""this removed non-numeric characters from
+	a string to return a cleaned up phone number"""
+	badBits = ['(',')',' ','-']
+	for badBit in badBits:
+		number.replace(badBit, '')
+	return number
 
 def parseMsg(msg):
 	"""returns a phone number and message
@@ -108,17 +128,15 @@ def parseMsg(msg):
 	parts = msg.split()
 	number = parts[0]
 	#remove extraneous characters from number
-	number.replace('(', '')
-	number.replace(')', '')
-	number.replace('-', '')
+	number = cleanup_phone_number(number)
 	try:
 		num = int(number) #try to convert phone number to integer
 	except: 
 		raise ParseError #unable to parse phone number correctly
 	msg = ""
-  	for part in parts[1:-1]:
+  	for part in parts[1:-1]: #parts[0] is the number. This excludes the last part, which will be added after the for-loop
 		msg += part + ' '
-	msg += part #prevent appending ' ' to end of message
+	msg += parts[-1] #prevent appending ' ' to end of message
 	return number, msg
 
 def textfwd(gvoice, phone, msg):
@@ -136,6 +154,7 @@ def print_msgs(msgs):
     for msg in msgs:
         print msg.get("messageText")
 
+#I would like to somehow remove all these shelving protocols and embed it in a constructed class
 def get_voice_object():
     if creds.has_key("v"):
         v = creds["v"] #get the stored voice object, so we don't keep creating a new one
@@ -149,10 +168,7 @@ def runCmdProgram():
     	load_creds()
 	usr, pw = getLogin() #login credentials
 	query = getPhone() #get phone number to monitor
-	query.replace('(', '')
-	query.replace(')', '')
-	query.replace(' ', '')
-	query.replace('-', '')
+	query = cleanup_phone_number(query) #removes non-numeric characters from number
 	print "Loggin' in..."
 	v = get_voice_object()
     	v.login(usr, pw)

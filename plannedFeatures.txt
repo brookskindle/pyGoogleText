@@ -8,4 +8,5 @@ ability to text from any phone, not just your own. Could include a 6-digit pin c
 
 ****Known Errors****
 LoginError - occurs when you are unable to log into your google voice account
+--often as a result of an unfixed pygooglevoice login url. (may need to run fix google voice)
 URLError: <urlopen error [Errno 10060] A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond>
