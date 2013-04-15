@@ -1,3 +1,7 @@
+#there may be errors if you try to include quotes in
+#your message. got a ParsingError as I was texting
+#with weird symbols in my message. Message sent ok,
+#but was 2 fetches later a parseError occured
 from googlevoice import Voice
 import time
 import shelve
@@ -71,7 +75,7 @@ def compare(msg1, msg2):
 def getUnreadTexts(gvoice, ph):
     """returns a sorted message list of unread texts from a given phone number
     gvoice is the Voice() instance
-	ph is the phone number
+    ph is the phone number
     returns msglist
     where msglist is the unread message
     list sorted from newest to oldest"""
@@ -95,49 +99,49 @@ def markMessage(msg, isRead = 1):
     as, 1 for read, 0 for unread
     does not return anything"""
     msg.mark(isRead)
-	
+    
 def get_msg_children(msg):
-	return msg.children() #does this work?
+    return msg.children() #does this work?
 
 def delMessage(msg, move2Trash = 1):
-	"""deletes the message. Use after sending
-	the message off to the intended recipient. 
-	This is so that when the othe person replies
-	he does not get a repeat message, since only
-	the first message generally shows up as unread,
-	and would continually send off that same first msg"""
-	msg.delete(move2Trash) #if we call msg.delete(0) that un-deletes the msg
-	
+    """deletes the message. Use after sending
+    the message off to the intended recipient. 
+    This is so that when the othe person replies
+    he does not get a repeat message, since only
+    the first message generally shows up as unread,
+    and would continually send off that same first msg"""
+    msg.delete(move2Trash) #if we call msg.delete(0) that un-deletes the msg
+    
 def cleanup_phone_number(number):
-	"""this removed non-numeric characters from
-	a string to return a cleaned up phone number"""
-	badBits = ['(',')',' ','-']
-	for badBit in badBits:
-		number.replace(badBit, '')
-	return number
+    """this removed non-numeric characters from
+    a string to return a cleaned up phone number"""
+    badBits = ['(',')',' ','-']
+    for badBit in badBits:
+        number.replace(badBit, '')
+    return number
 
 def parseMsg(msg):
-	"""returns a phone number and message
-    	hidden inside of a message (ie, parsing
-    	the message so long as the message is
-    	in the format "<phone-number> <message>"
-    	msg is the text message
-    	returns phone, message
-    	where phone is the phone number
-    	and message is the text message"""
-	parts = msg.split()
-	number = parts[0]
-	#remove extraneous characters from number
-	number = cleanup_phone_number(number)
-	try:
-		num = int(number) #try to convert phone number to integer
-	except: 
-		raise ParseError #unable to parse phone number correctly
-	msg = ""
-  	for part in parts[1:-1]: #parts[0] is the number. This excludes the last part, which will be added after the for-loop
-		msg += part + ' '
-	msg += parts[-1] #prevent appending ' ' to end of message
-	return number, msg
+    """returns a phone number and message
+        hidden inside of a message (ie, parsing
+        the message so long as the message is
+        in the format "<phone-number> <message>"
+        msg is the text message
+        returns phone, message
+        where phone is the phone number
+        and message is the text message"""
+    parts = msg.split()
+    number = parts[0]
+    #remove extraneous characters from number
+    number = cleanup_phone_number(number)
+    try:
+        num = int(number) #try to convert phone number to integer
+    except: 
+        raise ParseError #unable to parse phone number correctly
+    msg = ""
+    for part in parts[1:-1]: #parts[0] is the number. This excludes the last part, which will be added after the for-loop
+        msg += part + ' '
+    msg += parts[-1] #prevent appending ' ' to end of message
+    return number, msg
 
 def textfwd(gvoice, phone, msg):
     """texts a phone number with the given message
@@ -164,30 +168,31 @@ def get_voice_object():
     return v
 
 def runCmdProgram():
-	"""runs the command line version of the program"""
-    	load_creds()
-	usr, pw = getLogin() #login credentials
-	query = getPhone() #get phone number to monitor
-	query = cleanup_phone_number(query) #removes non-numeric characters from number
-	print "Loggin' in..."
-	v = get_voice_object()
-    	v.login(usr, pw)
-    	print "Displayin' unread texts..."
-	while(True): #infinite loop to keep monitoring for unread texts
-		unread = getUnreadTexts(v, query)
-		for new in unread: #loop unread messages
-			try:
-				msg = new.get("messageText") #text message in string form (msg)
-				ph, txt = parseMsg(msg) #split string into phone number and text message parts
-			except ParseError: #invalid message
-				print "Unable to parse message", new, "...skipping"
-			else:
-				markMessage(new)
-				v.send_sms(ph, txt) #send text
-				print "Text sent to " + ph + " : \"" + txt + "\""
-		secs = 5
-		print "Waiting", secs, "second(s) before fetching unread texts"
-		wait(secs)
+    """runs the command line version of the program"""
+    load_creds()
+    usr, pw = getLogin() #login credentials
+    query = getPhone() #get phone number to monitor
+    query = cleanup_phone_number(query) #removes non-numeric characters from number
+    print "Loggin' in..."
+    v = get_voice_object()
+    v.login(usr, pw)
+    print "Displayin' unread texts..."
+    while(True): #infinite loop to keep monitoring for unread texts
+        unread = getUnreadTexts(v, query)
+        for new in unread: #loop unread messages
+            try:
+                msg = new.get("messageText") #text message in string form (msg)
+                ph, txt = parseMsg(msg) #split string into phone number and text message parts
+            except ParseError: #invalid message
+                print "Unable to parse message", new, "...skipping"
+            else:
+                markMessage(new)
+                v.send_sms(ph, txt) #send text
+                delMessage(new) #delete message as well, so that the next incoming message is monitored
+                print "Text sent to " + ph + " : \"" + txt + "\""
+        secs = 5
+        print "Waiting", secs, "second(s) before fetching unread texts"
+        wait(secs)
 
 def store_creds():
     credstore = shelve.open("creds")
@@ -215,7 +220,7 @@ def refresh_creds():
     creds["v"] = get_voice_object() #gets a new voice object, which can be used to login as if new. Same usr and pw though
 
 def main():
-	runCmdProgram() #test the program
+    runCmdProgram() #test the program
 
 if __name__ == "__main__":
     main()
