@@ -5,6 +5,7 @@
 #(4/24/13)
 #reformated names and spacing to be consistent with python naming conventions
 #http://www.python.org/dev/peps/pep-0008/#function-names
+
 from googlevoice import Voice
 import time
 import shelve
@@ -113,6 +114,10 @@ def mark_message(msg, isRead=1):
 
 
 def get_msg_children(msg):
+    """get child message does not work! It has to do with the
+    parser and how google presents data. Too complicated to work with
+    """
+    print msg.children()
     return msg.children()  # does this work?
 
 
@@ -205,12 +210,13 @@ def run_cmd_program():
             except ParseError:  # invalid message
                 print "Unable to parse message", new, "...skipping"
             else:
-##                mark_message(new)  #if we delete message, then maybe child msg can get read next, not marked read
-                v.send_sms(ph, txt)  # send text
-                v.send_sms(query, "sent txt to " + ph)  # tell the user that his msg got through
-                delete_message(new)  # delete message as well, so that the next incoming message is monitored
+                mark_message(new)  #if we delete message, then maybe child msg can get read next, not marked read
+                v.send_sms(ph, txt)  # forward text to the specified recipient
+                v.send_sms(query, "sent txt to " + ph)  # tell the user that his msg got through.
                 print "Text sent to " + ph + " : \"" + txt + "\""
-        secs = 5
+            delete_message(new)  # delete message regardless if processed or not. if you mess up a fwd text, deleting it
+                                 # is the ONLY way to make sure that your next message is properly processed / in front
+        secs = 5*60
         print "Waiting", secs, "second(s) before fetching unread texts"
         wait(secs)
 
