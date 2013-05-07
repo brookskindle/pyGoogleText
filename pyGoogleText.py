@@ -6,6 +6,12 @@
 #reformated names and spacing to be consistent with python naming conventions
 #http://www.python.org/dev/peps/pep-0008/#function-names
 
+import sys
+import os
+
+#include the include folder in the path when searching for imports
+sys.path.insert(0, os.getcwd() + "\\include")
+
 from googlevoice import Voice
 import time
 import shelve
@@ -250,9 +256,9 @@ def refresh_creds():
     creds["v"] = get_voice_object()  # gets a new gv object, which can be used to login as if new. Same usr and pw tho
 
 
-def main():
-    run_cmd_program()  # test the program
+def main(argc, argv):
+    run_cmd_program()  # run program
 
 
 if __name__ == "__main__":
-    main()
+    main(len(sys.argv), sys.argv)
