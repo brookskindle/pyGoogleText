@@ -41,7 +41,7 @@ def quantify_time(msg):
     return age
 
 
-def get_login():
+def get_login(): #no longer in use
     """prompts user for gvoice login info
     returns usr, pw
     where usr is the email
@@ -55,6 +55,25 @@ def get_login():
         usr = creds["usr"]
         pw = creds["pw"]
     return usr, pw
+
+
+def get_username():
+    """prompts user for gvoice username and returns it"""
+    if not creds:
+        usr = raw_input("Enter google email address: ")
+        creds["usr"] = usr
+    else:
+        usr = creds["usr"]
+    return usr
+
+
+def get_password():
+    """prompts user for gvoice password and returns it"""
+    if not creds:
+        pw = raw_input("Enter password: ")
+    else:
+        pw = creds["pw"]
+    return pw
 
 
 def get_phone():
@@ -196,12 +215,26 @@ def get_voice_object():  # I would like to somehow remove all these shelving pro
         creds["v"] = v
     return v
 
+def get_delay():
+    """prompts user for time delay between google voice polls"""
+    d = raw_input("Enter a time delay to wait between polls: ")
+    d = int(d) #convert delay to integer
+    return d
 
-def run_cmd_program():
+
+def run_cmd_program(usr = "", pw = "", query = 0, delay = 0):
     """runs the command line version of the program"""
     load_creds()
-    usr, pw = get_login()  # login credentials
-    query = get_phone()  # get phone number to monitor
+                  
+    if not usr:
+        usr = get_username()  # username login credentials
+    if not pw:
+        pw = get_password()  # username password credentials
+    if not query:
+        query = get_phone()  # get phone number to monitor
+    if not delay:
+        delay = get_delay()  # get delay between polls
+
     query = cleanup_phone_number(query)  # removes non-numeric characters from number
     print "Loggin' in..."
     v = get_voice_object()
@@ -222,9 +255,8 @@ def run_cmd_program():
                 print "Text sent to " + ph + " : \"" + txt + "\""
             delete_message(new)  # delete message regardless if processed or not. if you mess up a fwd text, deleting it
                                  # is the ONLY way to make sure that your next message is properly processed / in front
-        secs = 5*60
-        print "Waiting", secs, "second(s) before fetching unread texts"
-        wait(secs)
+        print "Waiting", delay, "second(s) before fetching unread texts"
+        wait(delay)
 
 
 def store_creds():
@@ -257,7 +289,11 @@ def refresh_creds():
 
 
 def main(argc, argv):
-    run_cmd_program()  # run program
+    if argc <= 1:
+        run_cmd_program()  # run program with no command arguments
+    else:
+        #parse command arguments
+        pass
 
 
 if __name__ == "__main__":
