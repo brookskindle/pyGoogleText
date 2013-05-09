@@ -218,11 +218,11 @@ def get_voice_object():  # I would like to somehow remove all these shelving pro
 def get_delay():
     """prompts user for time delay between google voice polls"""
     d = raw_input("Enter a time delay to wait between polls: ")
-    d = int(d) #convert delay to integer
+    d = eval(d) #convert delay to (hopefully) integer
     return d
 
 
-def run_cmd_program(usr = "", pw = "", query = 0, delay = 0):
+def run_cmd_program(usr = "", pw = "", query = "", delay = 0):
     """runs the command line version of the program"""
     load_creds()
                   
@@ -292,9 +292,31 @@ def main(argc, argv):
     if argc <= 1:
         run_cmd_program()  # run program with no command arguments
     else:
+        usr = ""
+        pw = ""
+        query = ""
+        delay = 0
+        skip = False
         #parse command arguments
-        pass
+        for i in range(1, len(argv)):
+            if skip:
+                skip = False #skip this argument
+                
+            else: #don't skip argument
+                if argv[i] == "-u" or argv[i] == "-usr": #username specified
+                    usr = argv[i + 1]
+                    skip = True
+                elif argv[i] == "-p" or argv[i] == "-pw": #password specified
+                    pw = argv[i + 1]
+                    skip = True
+                elif argv[i] == "-d" or argv[i] == "-delay": #time delay specified
+                    delay = eval(argv[i + 1])
+                    skip = True
+                elif argv[i] == "-ph" or argv[i] == "-phone": #phone number to monitor from specified
+                    query = argv[i + 1]
+                    skip = True
 
+        run_cmd_program(usr, pw, query, delay) #run the program with command line arguments
 
 if __name__ == "__main__":
     main(len(sys.argv), sys.argv)
